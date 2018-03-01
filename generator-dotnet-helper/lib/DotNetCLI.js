@@ -5,6 +5,11 @@ class DotNetCLI {
         this.process = require('child_process');
     }
 
+    createProject(projectDirectory, projectTemplate, callbackSuccess){        
+        var command = 'dotnet new ' + projectTemplate + ' -o ' + projectDirectory;
+        this.run(command, callbackSuccess);
+    }
+
     createSolution(solutionDirectory, solutionFilename, callbackSuccess){
         var command = 'dotnet new sln -o ' + solutionDirectory
             + ' -n ' + solutionFilename;
@@ -13,20 +18,22 @@ class DotNetCLI {
     }
 
     addProjectToSolution(solutionFilename, projectFilename, callbackSuccess){
-        /*var command = 'dotnet new sln -o ' + projectDirectory;
-        this.run(command, callbackSuccess);*/
+        var command = 'dotnet sln ' + solutionFilename + ' add ' + projectFilename;
+        this.run(command, callbackSuccess);
     }
 
-    createProject(projectDirectory, projectTemplate, callbackSuccess){        
-        var command = 'dotnet new ' + projectTemplate + ' -o ' + projectDirectory;
+    addProjectReference(projectFilename, projectReferenceFilename, callbackSuccess){
+        var command = 'dotnet add ' + projectFilename + ' reference ' + projectReferenceFilename;
         this.run(command, callbackSuccess);
     }
 
     run(command, callbackSuccess){      
-        this.context.log(command) ;
-        this.process.exec(command, (error, stdout, stderr)=>{
+        //this.context.log(command) ;
+        this.process.execSync(command)
+        callbackSuccess();
+        /*this.process.execSync(command, (error, stdout, stderr)=>{
             this.callbackHandler(error, stdout, stderr, callbackSuccess)
-        });
+        });*/
     }
 
     callbackHandler(error, stdout, stderr, callbackSuccess){

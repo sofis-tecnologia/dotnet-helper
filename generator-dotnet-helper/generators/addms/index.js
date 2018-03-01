@@ -1,13 +1,23 @@
 const Utils = require('../../lib/Utils');
 const DotNetCLI = require('../../lib/DotNetCLI');
 const RootFolder = 'Microservices'
-const DefaultProjectType = 'classlib';
-const DefaultProjects = [
-    ['Application'], 
-    ['Model'], 
-    ['Repository'], 
-    ['UnitTest', 'xunit'],
-    ['*API', 'webapi']
+const DefaultProjectTemplate = 'classlib';
+const SearchChar = '%';
+/* 
+    Project Array:
+    [0] = (string) Name of Project,
+    [1] = (string) template used,
+    [2] = (string)[] projects dependencies
+    *** Obs: the 'SearchCharacter' will be replaced by the project name.
+    E.g.: CustomerAPI will be created for Customer 
+          inputed as project name.
+*/
+const Projects = [
+    ['Model',           DefaultProjectTemplate, []], 
+    ['Repository',      DefaultProjectTemplate, ['Model']],
+    ['Application',     DefaultProjectTemplate, ['Model', 'Repository']],
+    ['UnitTest',        'xunit',                ['Model', 'Repository', 'Application']],
+    [ SearchChar+'API', 'webapi',               ['Model', 'Repository', 'Application']]
 ]
 
 var Generator = require('yeoman-generator');
@@ -26,7 +36,10 @@ module.exports = class extends Generator {
             this.microserviceName = args[0];
 
             this.microserviceFolder = this.destinationPath(
-                RootFolder + '/' + this.microserviceName);                
+                RootFolder + '/' + this.microserviceName
+            );
+
+            this.solutionFilename = this.microserviceName+'Solution';                                 
         }
     }
 
@@ -53,11 +66,9 @@ module.exports = class extends Generator {
     
     createMicroserviceSolution(){
         if(!this.canExecute) return;
-                
-        var solutionFilename = this.microserviceName+'Solution'
-
+        
         this.dotNetCLI.createSolution(
-            this.microserviceFolder, solutionFilename, ()=>{
+            this.microserviceFolder, this.solutionFilename, ()=>{
             
                 this.log(' Solution was created ...');
         });
@@ -66,20 +77,76 @@ module.exports = class extends Generator {
     createMicroserviceProjects(){
         if(!this.canExecute) return;
         
-        DefaultProjects.forEach((value, index)=>{
+        this.log(' Creating the projects ...');
+        Projects.forEach((value, index)=>{
 
-            var projectDirectory = this.microserviceFolder + '/' + value[0];
-            var projectTemplate = value.length == 1? DefaultProjectType : value[1];
-            var projectName = value[0];
-
-            if(index == DefaultProjects.length -1 ){
-                projectDirectory = projectDirectory.replace("*", this.microserviceName);
-                projectName = projectDirectory.replace("*", this.microserviceName);
+            var projectName = value[0];                
+            var projectTemplate = value[1];
+            
+            if(value[0].search(SearchChar) > -1 ){
+                projectName = projectName.replace(
+                    SearchChar, this.microserviceName);
             }
+            var projectDirectory = this.microserviceFolder + '/' + projectName;
 
             this.dotNetCLI.createProject(projectDirectory, projectTemplate, ()=>{
                 this.log(' Project '+projectName+' was created ...');
             });
         });
+    }
+
+    addProjectsToSolution(){
+        if(!this.canExecute) return;
+
+        this.log(' Adding the projects to '+this.solutionFilename+' ...');
+
+        var solutionFilename = this.microserviceFolder + '/' 
+            + this.solutionFilename + '.sln';
+
+        Projects.forEach((value, index)=>{
+
+            var projectName = value[0];            
+
+            if(projectName.search(SearchChar) > -1 ){                                
+                projectName = projectName.replace(
+                    SearchChar, this.microserviceName);              
+            }
+            var projectFilename = this.microserviceFolder + '/' 
+                + projectName + '/' + projectName + '.csproj'; 
+
+            this.dotNetCLI.addProjectToSolution(solutionFilename, projectFilename, ()=>{
+                this.log(' The '+projectName+' project was added to '
+                    + this.solutionFilename+' ...');
+            });
+        });  
+    }
+
+    addProjectsReferences(){
+        if(!this.canExecute) return;
+
+        Projects.forEach((value, index)=>{
+
+            var projectName = value[0];            
+
+            if(projectName.search(SearchChar) > -1 ){                                
+                projectName = projectName.replace(
+                    SearchChar, this.microserviceName);              
+            }
+
+            this.log(' Adding references to '+projectName+' ...');
+
+            var projectFilename = this.microserviceFolder + '/' 
+                + projectName + '/' + projectName + '.csproj';
+
+            value[2].forEach(projectReference =>{
+
+                var projectReferenceFilename = this.microserviceFolder + '/' 
+                    + projectReference + '/' + projectReference + '.csproj';
+
+                this.dotNetCLI.addProjectReference(projectFilename, projectReferenceFilename, ()=>{
+                    this.log('-> the reference '+projectReference+' was added.');
+                });
+            });
+        });  
     }
 }
