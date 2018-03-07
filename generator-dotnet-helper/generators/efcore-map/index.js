@@ -1,6 +1,6 @@
 const Utils = require('../../lib/Utils');
 const DotNetCLI = require('../../lib/DotNetCLI');
-const MapSettingsFilename = 'mapFileStruct.json'
+const MapSettingsFilename = 'mapFileSettings.json'
 
 const MapSettingsFile = {
     stringConnection:'',
