@@ -7,7 +7,7 @@
 
  1) add-microservice   | addms     -> Create a microservice solution and the following projects: *API, Application, Model, Repository and UnitTest.
  Usage:
-    yo dthp:addms 'NameOfTheMicroService'
+    yo dthp:addms 'NameOfTheMicroservice'
 
  2) add-shared-project | addsp     -> Create a shared project, commonly used for sharing classes between the microservices.
  Usage:
