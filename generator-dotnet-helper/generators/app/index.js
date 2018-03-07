@@ -18,7 +18,8 @@ module.exports = class extends Generator {
 
     output += ' 3) efcore-map         | --        -> Map tables using EntityFrameworkCore. Quick start: execute the command once to create the settings file. '
            + '\n                                     Then, execute it again to map your tables - put your settings on the created file before the second execution.'
-           + '\n                                     ** In the settings file, leave tables array propety empty for map all tables.';
+           + '\n                                     ** In the settings file, leave tables array propety empty for map all tables.'
+           + '\n                                     ** Execute this command inside your Repository project folder, where the EFCore is installed.';
     output += "\n Usage:\n    yo dthp:efcore-map \n\n";
 
     this.log(output);
