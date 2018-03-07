@@ -4,8 +4,8 @@ const MapSettingsFilename = 'mapFileSettings.json'
 
 const MapSettingsFile = {
     stringConnection:'',
-    dbContextFilename: '',
-    outputFolder:'',
+    dbContextFilename: 'MyDB',
+    outputFolder:'EntityModels',
     tables:[]
 }
 
