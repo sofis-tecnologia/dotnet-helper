@@ -1,26 +1,5 @@
 const Utils = require('../../lib/Utils');
 const DotNetCLI = require('../../lib/DotNetCLI');
-const RootFolder = 'Microservices'
-const DefaultProjectTemplate = 'classlib';
-const SearchChar = '%';
-/* 
-    Project Array:
-    [0] = (string) Name of Project,
-    [1] = (string) template used,
-    [2] = (string)[] projects dependencies
-    *** Obs: the 'SearchCharacter' will be replaced by the project name.
-    E.g.: CustomerAPI will be created for Customer 
-          inputed as project name.
-*/
-//TODO: substitute the SearchChar for the inputted project name using Array.map().
-const Projects = [
-    ['Model', DefaultProjectTemplate, []],
-    ['Repository', DefaultProjectTemplate, ['Model']],
-    ['Application', DefaultProjectTemplate, ['Model', 'Repository']],
-    ['UnitTest', 'xunit', ['Model', 'Repository', 'Application']],
-    [SearchChar + 'API', 'webapi', ['Model', 'Repository', 'Application']]
-]
-
 const MapSettingsFilename = 'mapFileStruct.json'
 
 const MapSettingsFile = {
