@@ -1,5 +1,6 @@
 # DotNetCore Helper
 
+
 ## Getting Started
 
 ### Prerequisites
@@ -23,4 +24,5 @@ Type on terminal in anywhere:
 yo dthp
 ```
 You'll see:
-[[https://github.com/sofis-tecnologia/dotnet-helper/blob/master/src/app.png|alt=octocat]]
+
+![Alt text](https://github.com/sofis-tecnologia/dotnet-helper/blob/master/generator-dotnet-helper/src/app.png)
