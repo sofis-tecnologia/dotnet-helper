@@ -27,13 +27,28 @@ class DotNetCLI {
         this.run(command, callbackSuccess);
     }
 
-    run(command, callbackSuccess){      
-        //this.context.log(command) ;
+    mapEfCore(stringConnection, outputFolder, tables, dbContextFilename, callbackSuccess){
+
+        var tablesInline = '';
+        tables.forEach(table => {
+            tablesInline += ' -t ' + table;    
+        });
+        var command = 'dotnet ef dbcontext scaffold "'+stringConnection + '"'
+            +' Microsoft.EntityFrameworkCore.SqlServer -o ' + outputFolder
+            + tablesInline + '  -c "'+dbContextFilename+'" -f';
+        
+        this.runAsync(command, callbackSuccess);
+    }
+
+    run(command, callbackSuccess){              
         this.process.execSync(command)
-        callbackSuccess();
-        /*this.process.execSync(command, (error, stdout, stderr)=>{
+        callbackSuccess();        
+    }
+
+    runAsync(command, callbackSuccess){              
+        this.process.exec(command, (error, stdout, stderr)=>{
             this.callbackHandler(error, stdout, stderr, callbackSuccess)
-        });*/
+        });
     }
 
     callbackHandler(error, stdout, stderr, callbackSuccess){
