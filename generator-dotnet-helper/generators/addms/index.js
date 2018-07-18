@@ -5,20 +5,21 @@ const DefaultProjectTemplate = 'classlib';
 const SearchChar = '%';
 /* 
     Project Array:
-    [0] = (string) Name of Project,
+    [0] = (string) name of Project,
     [1] = (string) template used,
     [2] = (string)[] projects dependencies
+    [3] = (boolean) should create the run bat file.
     *** Obs: the 'SearchCharacter' will be replaced by the project name.
     E.g.: CustomerAPI will be created for Customer 
           inputed as project name.
 */
 //TODO: substitute the SearchChar for the inputted project name using Array.map().
 const Projects = [
-    ['Model', DefaultProjectTemplate, []],
-    ['Repository', DefaultProjectTemplate, ['Model']],
-    ['Application', DefaultProjectTemplate, ['Model', 'Repository']],
-    ['UnitTest', 'xunit', ['Model', 'Repository', 'Application']],
-    [SearchChar + 'API', 'webapi', ['Model', 'Repository', 'Application']]
+    ['Model', DefaultProjectTemplate, [], false],
+    ['Infrastructure', DefaultProjectTemplate, ['Model'], false],
+    ['Application', DefaultProjectTemplate, ['Model', 'Infrastructure'], false],
+    ['UnitTest', 'xunit', ['Model', 'Infrastructure', 'Application'], true],
+    [SearchChar + 'API', 'webapi', ['Model', 'Infrastructure', 'Application'], true]
 ]
 
 var Generator = require('yeoman-generator');
@@ -151,20 +152,21 @@ module.exports = class extends Generator {
         });
     }
 
-    createRunBatFileForAPIProject() {
+    createRunBatFileForMainProject() {
         if (!this.canExecute) return;
 
-        var projects = Projects.filter(project => project[1] == 'webapi');
+        Projects.forEach(project => {
+            if(project[3] == false) return;
 
-        if (projects.length == 0) return;
+            var projectName = project[0].replace(SearchChar, this.microserviceName);
+            this.log(' Creating bat file for ' + projectName + ' project ...');
 
-        this.log(' Creating bat file for API project ...');
-        var batFilename = this.microserviceFolder + '/run.bat';
-        var projectName = projects[0][0].replace(SearchChar, this.microserviceName)
-        var projectFilename = projectName + '/' + projectName + '.csproj';
-        var content = 'dotnet run -p ' + projectFilename;
+            var batFilename = this.microserviceFolder + '/' + projectName + ' - run.bat';
+            var projectFilename = projectName + '/' + projectName + '.csproj';
+            var content = 'dotnet run -p ' + projectFilename;
 
-        this.fs.write(batFilename, content)
+            this.fs.write(batFilename, content)
+        });
     }
 
     createXUnitTestBatFile() {
