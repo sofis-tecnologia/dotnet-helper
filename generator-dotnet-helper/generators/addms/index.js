@@ -18,7 +18,7 @@ const Projects = [
     ['Model', DefaultProjectTemplate, [], false],
     ['Infrastructure', DefaultProjectTemplate, ['Model'], false],
     ['Application', DefaultProjectTemplate, ['Model', 'Infrastructure'], false],
-    ['UnitTest', 'xunit', ['Model', 'Infrastructure', 'Application'], true],
+    ['UnitTest', 'xunit', ['Model', 'Infrastructure', 'Application'], false],
     [SearchChar + 'API', 'webapi', ['Model', 'Infrastructure', 'Application'], true]
 ]
 
@@ -69,8 +69,6 @@ module.exports = class extends Generator {
     createMicroserviceSolution() {
         if (!this.canExecute) return;
 
-        this.log(this.microserviceFolder)
-        this.log(this.solutionFilename)
         this.dotNetCLI.createSolution(
             this.microserviceFolder, this.solutionFilename, () => {                
                 this.log(' Solution was created ...');
@@ -162,9 +160,9 @@ module.exports = class extends Generator {
             var projectName = project[0].replace(SearchChar, this.microserviceName);
             this.log(' Creating bat file for ' + projectName + ' project ...');
 
-            var batFilename = this.microserviceFolder + '/' + projectName + ' - run.bat';
+            var batFilename = this.microserviceFolder + '/run - ' + projectName + '.bat';
             var projectFilename = projectName + '/' + projectName + '.csproj';
-            var content = 'dotnet run -p ' + projectFilename;
+            var content = 'dotnet run -p "' + projectFilename + '"';
 
             this.fs.write(batFilename, content)
         });
@@ -181,7 +179,7 @@ module.exports = class extends Generator {
         var batFilename = this.microserviceFolder + '/test.bat';
         var projectName = projects[0][0].replace(SearchChar, this.microserviceName)
         var projectFilename = projectName + '/' + projectName + '.csproj';
-        var content = 'dotnet test ' + projectFilename;
+        var content = 'dotnet test "' + projectFilename + '"';
 
         this.fs.write(batFilename, content)
     }
@@ -191,7 +189,7 @@ module.exports = class extends Generator {
 
         this.log(' Creating bat file for build solution ...');
         var batFilename = this.microserviceFolder + '/build.bat';
-        var content = 'dotnet build ' + this.solutionFilename + '.sln';
+        var content = 'dotnet build "' + this.solutionFilename + '.sln"';
 
         this.fs.write(batFilename, content)
     }
