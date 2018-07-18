@@ -69,9 +69,10 @@ module.exports = class extends Generator {
     createMicroserviceSolution() {
         if (!this.canExecute) return;
 
+        this.log(this.microserviceFolder)
+        this.log(this.solutionFilename)
         this.dotNetCLI.createSolution(
-            this.microserviceFolder, this.solutionFilename, () => {
-
+            this.microserviceFolder, this.solutionFilename, () => {                
                 this.log(' Solution was created ...');
             });
     }
